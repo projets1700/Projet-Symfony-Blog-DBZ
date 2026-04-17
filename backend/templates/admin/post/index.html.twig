@@ -18,6 +18,7 @@
                     <tr>
                         <th>Titre</th>
                         <th>Catégorie</th>
+                        <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -27,7 +28,20 @@
                             <td>{{ post.title }}</td>
                             <td>{{ post.category.name }}</td>
                             <td>
+                                {% if post.isApproved %}
+                                    <span class="badge text-bg-success">Publie</span>
+                                {% else %}
+                                    <span class="badge text-bg-secondary">En attente</span>
+                                {% endif %}
+                            </td>
+                            <td>
                                 <a href="{{ path('app_admin_post_edit', {id: post.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                                {% if not post.isApproved %}
+                                    <form method="post" action="{{ path('app_admin_post_validate', {id: post.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('validate_post_' ~ post.id) }}">
+                                        <button class="btn btn-sm btn-success">Publier</button>
+                                    </form>
+                                {% endif %}
                                 <form method="post" action="{{ path('app_admin_post_delete', {id: post.id}) }}" class="d-inline">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete_post_' ~ post.id) }}">
                                     <button class="btn btn-sm btn-danger">Supprimer</button>
@@ -35,10 +49,13 @@
                             </td>
                         </tr>
                     {% else %}
-                        <tr><td colspan="3">Aucun article.</td></tr>
+                        <tr><td colspan="4">Aucun article.</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            <div class="mt-3 d-flex justify-content-center">
+                {{ knp_pagination_render(posts) }}
             </div>
         </div>
     </div>

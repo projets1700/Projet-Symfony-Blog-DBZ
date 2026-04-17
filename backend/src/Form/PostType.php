@@ -28,11 +28,14 @@ class PostType extends AbstractType
                 'label' => 'Image de l\'article',
                 'mapped' => false,
                 'required' => false,
+                'attr' => [
+                    'accept' => '.jpg,.jpeg,.png,.webp',
+                ],
                 'constraints' => [
                     new File(
                         maxSize: '4M',
-                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-                        mimeTypesMessage: 'Merci de televerser une image JPG, PNG ou WEBP.'
+                        extensions: ['jpg', 'jpeg', 'png', 'webp'],
+                        extensionsMessage: 'Merci de televerser une image JPG, PNG ou WEBP.'
                     ),
                 ],
             ])

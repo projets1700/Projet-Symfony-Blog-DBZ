@@ -27,6 +27,9 @@ class Post
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $picture = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isApproved = false;
+
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
@@ -41,10 +44,17 @@ class Post
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
 
+    /**
+     * @var Collection<int, PostLike>
+     */
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostLike::class, orphanRemoval: true)]
+    private Collection $likes;
+
     public function __construct()
     {
         $this->publishedAt = new \DateTimeImmutable();
         $this->comments = new ArrayCollection();
+        $this->likes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -100,6 +110,18 @@ class Post
         return $this;
     }
 
+    public function isApproved(): bool
+    {
+        return $this->isApproved;
+    }
+
+    public function setIsApproved(bool $isApproved): static
+    {
+        $this->isApproved = $isApproved;
+
+        return $this;
+    }
+
     public function getAuthor(): ?User
     {
         return $this->author;
@@ -146,6 +168,33 @@ class Post
     {
         if ($this->comments->removeElement($comment) && $comment->getPost() === $this) {
             $comment->setPost(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PostLike>
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(PostLike $like): static
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+            $like->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(PostLike $like): static
+    {
+        if ($this->likes->removeElement($like) && $like->getPost() === $this) {
+            $like->setPost(null);
         }
 
         return $this;

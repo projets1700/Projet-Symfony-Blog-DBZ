@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email envoye{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="content-card">
+            <h1 class="page-title mb-3">Verifie tes emails</h1>
+            <p>
+                Un email de reinitialisation vient d'etre envoye si un compte existe.
+                Le lien expire dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+            </p>
+            <a href="{{ path('app_forgot_password_request') }}" class="btn btn-outline-light">Renvoyer un email</a>
+        </div>
+    </div>
+{% endblock %}

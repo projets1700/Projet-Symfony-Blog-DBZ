@@ -10,18 +10,22 @@
         "doctrine/doctrine-bundle": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
+        "knplabs/knp-paginator-bundle": "^6.10",
         "symfony/asset-mapper": "8.0.*",
         "symfony/console": "8.0.*",
         "symfony/dotenv": "8.0.*",
         "symfony/flex": "^2",
         "symfony/form": "8.0.*",
         "symfony/framework-bundle": "8.0.*",
+        "symfony/http-client": "8.0.*",
         "symfony/mailer": "8.0.*",
         "symfony/runtime": "8.0.*",
         "symfony/security-bundle": "8.0.*",
+        "symfony/translation": "8.0.*",
         "symfony/twig-bundle": "8.0.*",
         "symfony/validator": "8.0.*",
-        "symfony/yaml": "8.0.*"
+        "symfony/yaml": "8.0.*",
+        "symfonycasts/reset-password-bundle": "^1.25"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.67"

@@ -23,6 +23,9 @@
                     <label class="form-label">Mot de passe</label>
                     <input type="password" name="_password" required class="form-control">
                 </div>
+                <div class="mb-3">
+                    <a href="{{ path('app_forgot_password_request') }}" class="link-light">Mot de passe oublie ?</a>
+                </div>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                 <button type="submit" class="btn btn-primary">Se connecter</button>
             </form>

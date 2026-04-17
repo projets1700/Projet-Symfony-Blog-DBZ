@@ -39,6 +39,7 @@
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="{{ path('app_post_index') }}">Articles</a></li>
                 {% if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_admin_dashboard') }}">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ path('app_admin_post_index') }}">Gestion des articles</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ path('app_admin_user_index') }}">Gestion des utilisateurs</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ path('app_admin_comment_index') }}">Modération des commentaires</a></li>
@@ -66,6 +67,15 @@
                             {% endif %}
                         </a>
                     </li>
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_home', {'_switch_user': '_exit'}) }}">Quitter mode utilisateur</a>
+                        </li>
+                    {% elseif is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_home', {'_switch_user': 'fan@dbz.local'}) }}">Tester en utilisateur</a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a></li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Connexion</a></li>

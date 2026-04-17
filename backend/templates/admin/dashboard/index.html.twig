@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard admin{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Dashboard administrateur</h1>
+                <p class="page-subtitle">Vue synthese de l'activite du blog.</p>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="content-card text-center">
+                    <h2 class="h6 mb-2">Utilisateurs</h2>
+                    <p class="display-6 mb-0">{{ kpis.users }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="content-card text-center">
+                    <h2 class="h6 mb-2">Articles</h2>
+                    <p class="display-6 mb-0">{{ kpis.posts }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="content-card text-center">
+                    <h2 class="h6 mb-2">Commentaires en attente</h2>
+                    <p class="display-6 mb-0">{{ kpis.pendingComments }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Top articles (engagement)</h2>
+            <div class="table-wrap">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Likes</th>
+                        <th>Commentaires</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for post in topPosts %}
+                        <tr>
+                            <td>{{ post.title }}</td>
+                            <td>{{ post.likesCount }}</td>
+                            <td>{{ post.commentsCount }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">Aucun article disponible.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

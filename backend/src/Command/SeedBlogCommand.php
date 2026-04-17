@@ -6,6 +6,8 @@ use App\Entity\Category;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Service\AutoIllustrationGenerator;
+use App\Service\DbzArticleGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -18,7 +20,9 @@ class SeedBlogCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly DbzArticleGenerator $dbzArticleGenerator,
+        private readonly AutoIllustrationGenerator $autoIllustrationGenerator
     ) {
         parent::__construct();
     }
@@ -127,6 +131,7 @@ class SeedBlogCommand extends Command
 
             $post->setContent($data['content']);
             $post->setPicture($data['picture']);
+            $post->setIsApproved(true);
             $post->setAuthor($admin);
             $post->setCategory($categories[$data['category']]);
             $post->setPublishedAt(new \DateTimeImmutable(sprintf('-%d days', 7 - $index)));
@@ -154,9 +159,67 @@ class SeedBlogCommand extends Command
             $existingComment->setStatus('approved');
         }
 
+        // Ajoute automatiquement un lot d'articles DBZ supplementaires sans API externe.
+        $usedSubjectKeys = [];
+        foreach ($this->entityManager->getRepository(Post::class)->findAll() as $existingPost) {
+            $existingCategory = $existingPost->getCategory();
+            if (!$existingCategory instanceof Category) {
+                continue;
+            }
+
+            $subjectKey = $this->mapCategoryToSubjectKey($existingCategory->getName());
+            if (null !== $subjectKey) {
+                $usedSubjectKeys[] = $subjectKey;
+            }
+        }
+        $usedSubjectKeys = array_values(array_unique($usedSubjectKeys));
+
+        $autoPostCount = 8;
+        for ($i = 0; $i < $autoPostCount; ++$i) {
+            $generated = $this->dbzArticleGenerator->generateArticle($usedSubjectKeys);
+            if (null === $generated) {
+                break;
+            }
+
+            $existingPost = $this->entityManager->getRepository(Post::class)->findOneBy(['title' => $generated['title']]);
+            if ($existingPost instanceof Post) {
+                continue;
+            }
+
+            $categoryName = $generated['categoryName'];
+            if (!isset($categories[$categoryName])) {
+                continue;
+            }
+
+            $autoPost = new Post();
+            $autoPost->setTitle($generated['title']);
+            $autoPost->setContent($generated['content']);
+            $illustrationPath = $this->autoIllustrationGenerator->generateAndStore($generated['title'], $generated['subject']);
+            $autoPost->setPicture($illustrationPath);
+            $autoPost->setIsApproved(false);
+            $autoPost->setAuthor($admin);
+            $autoPost->setCategory($categories[$categoryName]);
+            $autoPost->setPublishedAt(new \DateTimeImmutable(sprintf('-%d hours', random_int(6, 120))));
+            $this->entityManager->persist($autoPost);
+            $usedSubjectKeys[] = $generated['subjectKey'];
+        }
+
         $this->entityManager->flush();
         $output->writeln('Donnees Dragon Ball Z creees. Admin: admin@blog.local / Admin123! User: fan@dbz.local / Fan123!');
 
         return Command::SUCCESS;
+    }
+
+    private function mapCategoryToSubjectKey(?string $categoryName): ?string
+    {
+        return match ($categoryName) {
+            'Saiyans' => 'fierte-saiyan',
+            'Transformations' => 'transformations',
+            'Villains' => 'ennemis-dbz',
+            'Saga Cell' => 'saga-cell',
+            'Saga Buu' => 'saga-buu',
+            'Tournois' => 'tournois',
+            default => null,
+        };
     }
 }

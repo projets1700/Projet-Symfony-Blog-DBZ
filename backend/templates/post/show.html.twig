@@ -7,6 +7,18 @@
         <article class="content-card">
             <h1 class="page-title mb-2">{{ post.title }}</h1>
             <p class="page-subtitle">{{ post.category.name }} - {{ post.publishedAt|date('d/m/Y H:i') }}</p>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <span class="badge text-bg-danger">Likes: {{ post.likes|length }}</span>
+                {% if app.user %}
+                    {% set hasLiked = post.likes|filter(like => like.user and like.user.id == app.user.id)|length > 0 %}
+                    <form method="post" action="{{ path('app_post_like_toggle', {id: post.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('toggle_like_' ~ post.id) }}">
+                        <button class="btn btn-sm {{ hasLiked ? 'btn-outline-danger' : 'btn-danger' }}">
+                            {{ hasLiked ? 'Retirer le like' : 'Liker cet article' }}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
             {% if post.picture %}
                 <img src="{{ post.picture }}" class="article-cover my-4" alt="{{ post.title }}">
             {% endif %}
