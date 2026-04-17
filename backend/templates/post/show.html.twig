@@ -27,6 +27,14 @@
 
         <section class="content-card">
             <h2 class="section-title">Commentaires</h2>
+            {% if app.user %}
+                {% set hasPendingUserComment = post.comments|filter(comment => comment.author and comment.author.id == app.user.id and comment.status == 'pending')|length > 0 %}
+                {% if hasPendingUserComment %}
+                    <div class="alert alert-warning">
+                        L administrateur n a pas encore valide votre commentaire.
+                    </div>
+                {% endif %}
+            {% endif %}
             {% for comment in post.comments %}
                 {% if comment.status == 'approved' or is_granted('ROLE_ADMIN') %}
                     <div class="card comment-card mb-3">
@@ -34,9 +42,6 @@
                             <p class="mb-1">{{ comment.content }}</p>
                             <small class="text-muted">
                                 {{ comment.author.firstName }} {{ comment.author.lastName }} - {{ comment.createdAt|date('d/m/Y H:i') }}
-                                {% if is_granted('ROLE_ADMIN') %}
-                                    ({% if comment.status == 'approved' %}approuve{% elseif comment.status in ['rejected', 'deleted'] %}rejete{% else %}en attente{% endif %})
-                                {% endif %}
                             </small>
                         </div>
                     </div>

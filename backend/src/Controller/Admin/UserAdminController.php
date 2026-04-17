@@ -20,6 +20,9 @@ class UserAdminController extends AbstractController
     #[Route('', name: 'app_admin_user_index')]
     public function index(Request $request, UserRepository $userRepository, PaginatorInterface $paginator): Response
     {
+        $adminCount = $userRepository->countAdmins();
+        $maxAdminCount = 3;
+
         $usersPagination = $paginator->paginate(
             $userRepository->createQueryBuilder('u')->orderBy('u.createdAt', 'DESC'),
             $request->query->getInt('page', 1),
@@ -28,6 +31,9 @@ class UserAdminController extends AbstractController
 
         return $this->render('admin/user/index.html.twig', [
             'users' => $usersPagination,
+            'adminCount' => $adminCount,
+            'maxAdminCount' => $maxAdminCount,
+            'canPromoteAdmin' => $adminCount < $maxAdminCount,
         ]);
     }
 
@@ -47,12 +53,21 @@ class UserAdminController extends AbstractController
     }
 
     #[Route('/{id}/desactiver', name: 'app_admin_user_deactivate', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function deactivate(User $user, Request $request, EntityManagerInterface $entityManager): Response
+    public function deactivate(User $user, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         if (!$this->isCsrfTokenValid('deactivate_user_'.$user->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de securite invalide.');
 
             return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true) && $user->isActive()) {
+            $activeAdmins = $userRepository->countActiveAdmins();
+            if ($activeAdmins <= 1) {
+                $this->addFlash('error', 'Il doit toujours rester au moins un compte administrateur actif.');
+
+                return $this->redirectToRoute('app_admin_user_index');
+            }
         }
 
         $user->setIsActive(false);
@@ -62,7 +77,7 @@ class UserAdminController extends AbstractController
     }
 
     #[Route('/{id}/supprimer', name: 'app_admin_user_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function delete(User $user, Request $request, EntityManagerInterface $entityManager): Response
+    public function delete(User $user, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         if (!$this->isCsrfTokenValid('delete_user_'.$user->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de securite invalide.');
@@ -83,9 +98,87 @@ class UserAdminController extends AbstractController
             return $this->redirectToRoute('app_admin_user_index');
         }
 
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true) && $user->isActive()) {
+            $activeAdmins = $userRepository->countActiveAdmins();
+            if ($activeAdmins <= 1) {
+                $this->addFlash('error', 'Suppression refusee: il doit rester au moins un compte administrateur actif.');
+
+                return $this->redirectToRoute('app_admin_user_index');
+            }
+        }
+
         $entityManager->remove($user);
         $entityManager->flush();
         $this->addFlash('success', 'Utilisateur supprime avec succes.');
+
+        return $this->redirectToRoute('app_admin_user_index');
+    }
+
+    #[Route('/{id}/promouvoir-admin', name: 'app_admin_user_promote', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function promoteToAdmin(User $user, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    {
+        if (!$this->isCsrfTokenValid('promote_user_'.$user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de securite invalide.');
+
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $this->addFlash('error', 'Ce compte est deja administrateur.');
+
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        $adminCount = $userRepository->countAdmins();
+        if ($adminCount >= 3) {
+            $this->addFlash('error', 'Limite atteinte: maximum 3 comptes administrateurs.');
+
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        $roles = $user->getRoles();
+        $roles[] = 'ROLE_ADMIN';
+        $user->setRoles(array_values(array_unique($roles)));
+        $user->setIsActive(true);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Le compte utilisateur a ete promu administrateur.');
+
+        return $this->redirectToRoute('app_admin_user_index');
+    }
+
+    #[Route('/{id}/retirer-admin', name: 'app_admin_user_demote', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function demoteFromAdmin(User $user, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    {
+        if (!$this->isCsrfTokenValid('demote_user_'.$user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de securite invalide.');
+
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $this->addFlash('error', 'Ce compte n est pas administrateur.');
+
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        if ($user->isActive()) {
+            $activeAdmins = $userRepository->countActiveAdmins();
+            if ($activeAdmins <= 1) {
+                $this->addFlash('error', 'Action refusee: il doit rester au moins un compte administrateur actif.');
+
+                return $this->redirectToRoute('app_admin_user_index');
+            }
+        }
+
+        $roles = array_values(array_filter(
+            $user->getRoles(),
+            static fn (string $role): bool => 'ROLE_ADMIN' !== $role
+        ));
+        $user->setRoles($roles);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Les droits administrateur ont ete retires.');
 
         return $this->redirectToRoute('app_admin_user_index');
     }

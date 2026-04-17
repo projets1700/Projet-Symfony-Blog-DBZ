@@ -9,6 +9,7 @@
                 <h1 class="page-title">Gestion des utilisateurs</h1>
                 <p class="page-subtitle">Consulte les comptes et gere leur activation dans une meme mise en page.</p>
             </div>
+            <span class="badge text-bg-warning text-dark">Admins: {{ adminCount }} / {{ maxAdminCount }}</span>
         </div>
         <div class="content-card">
             <div class="table-wrap">
@@ -27,9 +28,25 @@
                         <tr>
                             <td>{{ user.email }}</td>
                             <td>{{ user.firstName }} {{ user.lastName }}</td>
-                            <td>{{ user.roles|join(', ') }}</td>
+                            <td>
+                                {{ user.roles|join(', ') }}
+                                {% if 'ROLE_ADMIN' in user.roles %}
+                                    <span class="badge text-bg-warning text-dark ms-1">ADMIN</span>
+                                {% endif %}
+                            </td>
                             <td>{{ user.isActive ? 'Oui' : 'Non' }}</td>
                             <td>
+                                {% if 'ROLE_ADMIN' in user.roles %}
+                                    <form method="post" action="{{ path('app_admin_user_demote', {id: user.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('demote_user_' ~ user.id) }}">
+                                        <button class="btn btn-sm btn-outline-warning">Retirer admin</button>
+                                    </form>
+                                {% else %}
+                                    <form method="post" action="{{ path('app_admin_user_promote', {id: user.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('promote_user_' ~ user.id) }}">
+                                        <button class="btn btn-sm btn-warning" {% if not canPromoteAdmin %}disabled title="Limite de 3 admins atteinte"{% endif %}>Promouvoir admin</button>
+                                    </form>
+                                {% endif %}
                                 {% if user.isActive %}
                                     <form method="post" action="{{ path('app_admin_user_deactivate', {id: user.id}) }}" class="d-inline">
                                         <input type="hidden" name="_token" value="{{ csrf_token('deactivate_user_' ~ user.id) }}">

@@ -94,6 +94,19 @@ Route: `/admin/utilisateurs/commentaires`
 - l'admin peut le `Valider` ou le `Rejeter`
 - les actions sont disponibles uniquement sur les commentaires en attente
 - les commentaires approuves sont visibles publiquement sur l'article
+- le statut `approuve` n'est pas affiche publiquement dans le texte (si visible, il est valide)
+- un utilisateur voit une alerte sur l'article tant que son commentaire est en attente de validation admin
+
+## Regles de gestion des administrateurs
+
+Dans `/admin/utilisateurs`, les regles suivantes sont appliquees:
+
+- il doit toujours y avoir au moins 1 compte administrateur actif
+- un admin peut promouvoir un compte utilisateur en administrateur
+- maximum 3 comptes administrateurs au total
+- la promotion est desactivee visuellement quand la limite est atteinte
+- un badge `ADMIN` est affiche dans la liste utilisateurs
+- un compteur `Admins: X / 3` est affiche en haut de page
 
 ## Routes utiles
 
