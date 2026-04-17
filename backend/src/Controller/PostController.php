@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Category;
 use App\Entity\Post;
 use App\Entity\PostLike;
 use App\Entity\User;
@@ -21,38 +22,33 @@ class PostController extends AbstractController
 {
     #[Route('/articles', name: 'app_post_index')]
     public function index(
-        Request $request,
         PostRepository $postRepository,
-        CategoryRepository $categoryRepository,
-        PaginatorInterface $paginator
+        CategoryRepository $categoryRepository
     ): Response
     {
-        $query = trim((string) $request->query->get('q', ''));
-        $categoryId = $request->query->getInt('category');
-        $sort = (string) $request->query->get('sort', 'latest');
-        $allowedSorts = ['latest', 'oldest', 'title', 'popular'];
-        if (!in_array($sort, $allowedSorts, true)) {
-            $sort = 'latest';
-        }
-
-        $postsPagination = $paginator->paginate(
-            $postRepository->createFilteredQueryBuilder(
-                '' === $query ? null : $query,
-                $categoryId > 0 ? $categoryId : null,
-                $sort
-            ),
-            $request->query->getInt('page', 1),
-            6
-        );
+        $categories = $categoryRepository->findRootCategories();
 
         return $this->render('post/index.html.twig', [
+            'categories' => $categories,
+        ]);
+    }
+
+    #[Route('/articles/categorie/{id}', name: 'app_post_category', requirements: ['id' => '\d+'])]
+    public function byCategory(
+        Category $category,
+        Request $request,
+        PostRepository $postRepository,
+        PaginatorInterface $paginator
+    ): Response {
+        $postsPagination = $paginator->paginate(
+            $postRepository->createApprovedByCategoryQueryBuilder((int) $category->getId()),
+            $request->query->getInt('page', 1),
+            8
+        );
+
+        return $this->render('post/category.html.twig', [
+            'category' => $category,
             'posts' => $postsPagination,
-            'categories' => $categoryRepository->findBy([], ['name' => 'ASC']),
-            'filters' => [
-                'q' => $query,
-                'category' => $categoryId > 0 ? $categoryId : null,
-                'sort' => $sort,
-            ],
         ]);
     }
 

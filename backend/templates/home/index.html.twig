@@ -1,6 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Accueil{% endblock %}
+{% block shenron_effects %}
+    <span class="dragon-ball stars-1"></span>
+    <span class="dragon-ball stars-2"></span>
+    <span class="dragon-ball stars-3"></span>
+    <span class="dragon-ball stars-4"></span>
+    <span class="dragon-ball stars-5"></span>
+    <span class="dragon-ball stars-6"></span>
+    <span class="dragon-ball stars-7"></span>
+{% endblock %}
 
 {% block body %}
     <div class="page-shell">
@@ -24,18 +33,9 @@
         <section class="page-shell">
             <div class="page-header">
                 <div>
-                    <h2 class="page-title">Derniers articles DBZ</h2>
-                    <p class="page-subtitle">Les derniers sujets publies sur l'univers Dragon Ball Z.</p>
+                    <h2 class="page-title">Nouveaux Articles</h2>
                 </div>
-            </div>
-            <div class="content-card tight">
-                {% if is_granted('ROLE_ADMIN') %}
-                    <div class="alert alert-info mb-0">Mode administrateur : vous pouvez gerer les articles, utilisateurs et commentaires depuis le menu.</div>
-                {% elseif app.user %}
-                    <div class="alert alert-success mb-0">Mode utilisateur : vous pouvez lire les articles, commenter et modifier votre profil.</div>
-                {% else %}
-                    <div class="alert alert-warning mb-0">Mode visiteur : consultation uniquement. Connectez-vous pour commenter et acceder a votre profil.</div>
-                {% endif %}
+                <a href="{{ path('app_post_index') }}" class="btn btn-outline-light">Voir plus d'article</a>
             </div>
             <div class="row g-4">
                 {% for post in posts %}

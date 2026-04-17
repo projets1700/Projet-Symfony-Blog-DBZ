@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration des categories{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Administration des categories</h1>
+                <p class="page-subtitle">Definis les categories et leurs images pour la page Articles.</p>
+            </div>
+            <a href="{{ path('app_admin_category_new') }}" class="btn btn-primary">Nouvelle categorie</a>
+        </div>
+
+        <div class="content-card">
+            <div class="table-wrap">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Parente</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td>
+                                {% if category.picture %}
+                                    <img src="{{ category.picture }}" alt="{{ category.name }}" class="category-admin-thumb">
+                                {% else %}
+                                    <span class="badge text-bg-secondary">Aucune image</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.parent ? category.parent.name : '-' }}</td>
+                            <td>{{ category.description ?: '-' }}</td>
+                            <td>
+                                <a href="{{ path('app_admin_category_edit', {id: category.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                                <form method="post" action="{{ path('app_admin_category_delete', {id: category.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette categorie ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_category_' ~ category.id) }}">
+                                    <button class="btn btn-sm btn-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5">Aucune categorie.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

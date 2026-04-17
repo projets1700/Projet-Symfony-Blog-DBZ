@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'app:autopublish-dbz',
-    description: 'Publie automatiquement un article DBZ genere localement'
+    description: 'Publie automatiquement cinq articles DBZ generes localement'
 )]
 class AutoPublishDbzCommand extends Command
 {
@@ -29,6 +29,7 @@ class AutoPublishDbzCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $targetCount = 5;
         $admin = $this->entityManager->getRepository(User::class)->findOneBy(['email' => 'admin@blog.local']);
         if (!$admin instanceof User) {
             $output->writeln('<error>Admin introuvable. Lance d abord app:seed-blog.</error>');
@@ -38,17 +39,20 @@ class AutoPublishDbzCommand extends Command
 
         $usedSubjectKeys = [];
         foreach ($this->entityManager->getRepository(Post::class)->findAll() as $existingPost) {
-            $category = $existingPost->getCategory();
-            if (!$category instanceof Category) {
-                continue;
+            $subjectKey = $this->extractSubjectKeyFromTitle($existingPost->getTitle());
+            if (null !== $subjectKey) {
+                $usedSubjectKeys[] = $subjectKey;
             }
-
-            $usedSubjectKeys[] = $this->mapCategoryToSubjectKey($category->getName());
         }
         $usedSubjectKeys = array_values(array_filter(array_unique($usedSubjectKeys)));
 
-        $maxAttempts = 8;
+        $maxAttempts = 30;
+        $publishedCount = 0;
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+            if ($publishedCount >= $targetCount) {
+                break;
+            }
+
             $generated = $this->dbzArticleGenerator->generateArticle($usedSubjectKeys);
             if (null === $generated) {
                 break;
@@ -75,28 +79,37 @@ class AutoPublishDbzCommand extends Command
             $post->setPublishedAt(new \DateTimeImmutable());
 
             $this->entityManager->persist($post);
-            $this->entityManager->flush();
-
-            $output->writeln(sprintf('<info>Article publie: %s</info>', $post->getTitle()));
-
-            return Command::SUCCESS;
+            $usedSubjectKeys[] = $generated['subjectKey'];
+            ++$publishedCount;
+            $output->writeln(sprintf('<info>Article publie (%d/%d): %s</info>', $publishedCount, $targetCount, $post->getTitle()));
         }
 
-        $output->writeln('<error>Aucun article unique n a pu etre genere.</error>');
+        if (0 === $publishedCount) {
+            $output->writeln('<error>Aucun article unique n a pu etre genere.</error>');
 
-        return Command::FAILURE;
+            return Command::FAILURE;
+        }
+
+        $this->entityManager->flush();
+        $output->writeln(sprintf('<info>%d article(s) genere(s) automatiquement.</info>', $publishedCount));
+
+        return Command::SUCCESS;
     }
 
-    private function mapCategoryToSubjectKey(?string $categoryName): ?string
+    private function extractSubjectKeyFromTitle(?string $title): ?string
     {
-        return match ($categoryName) {
-            'Saiyans' => 'fierte-saiyan',
-            'Transformations' => 'transformations',
-            'Villains' => 'ennemis-dbz',
-            'Saga Cell' => 'saga-cell',
-            'Saga Buu' => 'saga-buu',
-            'Tournois' => 'tournois',
-            default => null,
-        };
+        if (!is_string($title)) {
+            return null;
+        }
+
+        if (preg_match('/^[^:]+:\s(.+?)\s-\s.+(?:\s\([A-Z0-9]{4}\))?$/', $title, $matches) !== 1) {
+            return null;
+        }
+
+        $subject = strtolower(trim($matches[1]));
+        $subject = preg_replace('/[^a-z0-9]+/', '-', $subject) ?? '';
+        $subject = trim($subject, '-');
+
+        return '' === $subject ? null : $subject;
     }
 }

@@ -188,7 +188,7 @@ body.shenron-awake .shenron-illustration {
     background:
         radial-gradient(circle at 82% 34%, rgba(255, 221, 87, 0.30) 0%, rgba(255, 221, 87, 0.14) 18%, rgba(255, 221, 87, 0) 40%),
         linear-gradient(96deg, rgba(8, 12, 24, 0.96) 0%, rgba(8, 12, 24, 0.84) 24%, rgba(18, 16, 14, 0.34) 46%, rgba(255, 130, 40, 0.06) 68%, rgba(255, 130, 40, 0.02) 84%, rgba(255, 130, 40, 0.01) 100%),
-        url("/images/goku-user-cutout-clean.png") 86% 52%/contain no-repeat,
+        url("/images/goku-angel-cutout.png") 86% 52%/contain no-repeat,
         linear-gradient(135deg, rgba(255, 120, 32, 0.16) 0%, rgba(255, 120, 32, 0.12) 40%, rgba(255, 185, 70, 0.10) 100%);
     min-height: 360px;
     box-shadow: 0 25px 45px rgba(0, 0, 0, 0.35);
@@ -224,6 +224,8 @@ body.shenron-awake .shenron-illustration {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    width: min(1100px, 100%);
+    margin-inline: auto;
 }
 
 .page-header {
@@ -257,6 +259,11 @@ body.shenron-awake .shenron-illustration {
     padding: 1.1rem 1.25rem;
 }
 
+.form-shell,
+.auth-shell {
+    width: min(820px, 100%);
+}
+
 .table-wrap {
     overflow-x: auto;
     border-radius: 14px;
@@ -272,6 +279,10 @@ body.shenron-awake .shenron-illustration {
     color: #fff4c6;
     font-weight: 700;
     background: rgba(255, 255, 255, 0.02);
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
 }
 
 .table td,
@@ -468,10 +479,76 @@ body.shenron-awake .shenron-illustration {
 
 .list-group-item {
     padding: 1rem 1.1rem;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .list-group-item + .list-group-item {
     margin-top: 0.75rem;
+}
+
+.btn {
+    border-radius: 12px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.btn-sm {
+    border-radius: 10px;
+}
+
+.btn-primary,
+.btn-success,
+.btn-warning {
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.alert {
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.badge {
+    border-radius: 999px;
+    padding: 0.4rem 0.65rem;
+}
+
+.pagination {
+    gap: 0.35rem;
+}
+
+.pagination .page-link {
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 213, 74, 0.25);
+    background: rgba(17, 24, 39, 0.9);
+    color: #f9fafb;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--shonen-gold);
+    color: #111827;
+    border-color: var(--shonen-gold);
+}
+
+.pagination .page-link:hover {
+    background: rgba(255, 213, 74, 0.15);
+    color: #fff4c6;
+}
+
+.profile-avatar {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+}
+
+.profile-placeholder-avatar {
+    width: 180px;
+    height: 180px;
+    font-size: 3rem;
+}
+
+.profile-picture-preview {
+    max-height: 220px;
 }
 
 .shonen-card {
@@ -485,6 +562,26 @@ body.shenron-awake .shenron-illustration {
 .shonen-card-img {
     height: 220px;
     object-fit: cover;
+}
+
+.category-card-img {
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(255, 213, 74, 0.18);
+}
+
+.category-card-placeholder {
+    height: 220px;
+    border-bottom: 1px solid rgba(255, 213, 74, 0.18);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.category-admin-thumb {
+    width: 86px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 213, 74, 0.28);
 }
 
 .card,
@@ -563,7 +660,7 @@ textarea:focus {
         background:
             radial-gradient(circle at 76% 28%, rgba(255, 221, 87, 0.24) 0%, rgba(255, 221, 87, 0.1) 20%, rgba(255, 221, 87, 0) 42%),
             linear-gradient(180deg, rgba(8, 12, 24, 0.93) 0%, rgba(8, 12, 24, 0.74) 48%, rgba(30, 24, 18, 0.44) 100%),
-            url("/images/goku-user-cutout-clean.png") center bottom/contain no-repeat,
+            url("/images/goku-angel-cutout.png") center bottom/contain no-repeat,
             linear-gradient(135deg, rgba(255, 120, 32, 0.14) 0%, rgba(255, 120, 32, 0.10) 40%, rgba(255, 185, 70, 0.08) 100%);
     }
 

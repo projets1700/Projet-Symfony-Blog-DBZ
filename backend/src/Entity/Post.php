@@ -8,6 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
+#[ORM\Table(indexes: [
+    new ORM\Index(name: 'idx_post_published_at', columns: ['published_at']),
+    new ORM\Index(name: 'idx_post_is_approved', columns: ['is_approved']),
+])]
 class Post
 {
     #[ORM\Id]

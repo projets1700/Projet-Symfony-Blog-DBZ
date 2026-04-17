@@ -3,9 +3,14 @@
 {% block title %}Email envoye{% endblock %}
 
 {% block body %}
-    <div class="page-shell">
+    <div class="page-shell auth-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Verifie tes emails</h1>
+                <p class="page-subtitle">Un lien de reinitialisation a ete envoye si ton compte existe.</p>
+            </div>
+        </div>
         <div class="content-card">
-            <h1 class="page-title mb-3">Verifie tes emails</h1>
             <p>
                 Un email de reinitialisation vient d'etre envoye si un compte existe.
                 Le lien expire dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.

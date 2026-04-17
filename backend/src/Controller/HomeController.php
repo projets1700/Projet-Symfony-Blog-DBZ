@@ -13,7 +13,7 @@ class HomeController extends AbstractController
     public function index(PostRepository $postRepository): Response
     {
         return $this->render('home/index.html.twig', [
-            'posts' => array_slice($postRepository->findLatest(), 0, 6),
+            'posts' => $postRepository->findLatestLimited(5),
         ]);
     }
 }

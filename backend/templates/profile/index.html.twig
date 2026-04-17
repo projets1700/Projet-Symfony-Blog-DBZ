@@ -15,9 +15,9 @@
                 <div class="card shonen-card h-100">
                     <div class="card-body text-center">
                         {% if user.profilePicture %}
-                            <img src="{{ user.profilePicture }}" alt="{{ user.firstName }}" class="img-fluid rounded-circle mb-3" style="width: 180px; height: 180px; object-fit: cover;">
+                            <img src="{{ user.profilePicture }}" alt="{{ user.firstName }}" class="img-fluid rounded-circle mb-3 profile-avatar">
                         {% else %}
-                            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center bg-warning text-dark fw-bold" style="width: 180px; height: 180px; font-size: 3rem;">
+                            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center bg-warning text-dark fw-bold profile-placeholder-avatar">
                                 {{ user.firstName|first }}{{ user.lastName|first }}
                             </div>
                         {% endif %}
@@ -40,7 +40,7 @@
                         <div class="mb-3">
                             <label class="form-label">Photo actuelle</label>
                             <div>
-                                <img src="{{ user.profilePicture }}" alt="{{ user.firstName }}" class="img-fluid rounded" style="max-height: 220px;">
+                                <img src="{{ user.profilePicture }}" alt="{{ user.firstName }}" class="img-fluid rounded profile-picture-preview">
                             </div>
                         </div>
                     {% endif %}

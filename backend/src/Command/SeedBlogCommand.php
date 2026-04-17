@@ -162,12 +162,7 @@ class SeedBlogCommand extends Command
         // Ajoute automatiquement un lot d'articles DBZ supplementaires sans API externe.
         $usedSubjectKeys = [];
         foreach ($this->entityManager->getRepository(Post::class)->findAll() as $existingPost) {
-            $existingCategory = $existingPost->getCategory();
-            if (!$existingCategory instanceof Category) {
-                continue;
-            }
-
-            $subjectKey = $this->mapCategoryToSubjectKey($existingCategory->getName());
+            $subjectKey = $this->extractSubjectKeyFromTitle($existingPost->getTitle());
             if (null !== $subjectKey) {
                 $usedSubjectKeys[] = $subjectKey;
             }
@@ -210,16 +205,20 @@ class SeedBlogCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function mapCategoryToSubjectKey(?string $categoryName): ?string
+    private function extractSubjectKeyFromTitle(?string $title): ?string
     {
-        return match ($categoryName) {
-            'Saiyans' => 'fierte-saiyan',
-            'Transformations' => 'transformations',
-            'Villains' => 'ennemis-dbz',
-            'Saga Cell' => 'saga-cell',
-            'Saga Buu' => 'saga-buu',
-            'Tournois' => 'tournois',
-            default => null,
-        };
+        if (!is_string($title)) {
+            return null;
+        }
+
+        if (preg_match('/^[^:]+:\s(.+?)\s-\s.+(?:\s\([A-Z0-9]{4}\))?$/', $title, $matches) !== 1) {
+            return null;
+        }
+
+        $subject = strtolower(trim($matches[1]));
+        $subject = preg_replace('/[^a-z0-9]+/', '-', $subject) ?? '';
+        $subject = trim($subject, '-');
+
+        return '' === $subject ? null : $subject;
     }
 }

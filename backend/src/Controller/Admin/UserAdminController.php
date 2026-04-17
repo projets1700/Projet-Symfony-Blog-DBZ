@@ -94,10 +94,7 @@ class UserAdminController extends AbstractController
     public function comments(Request $request, CommentRepository $commentRepository, PaginatorInterface $paginator): Response
     {
         $commentsPagination = $paginator->paginate(
-            $commentRepository->createQueryBuilder('c')
-                ->leftJoin('c.post', 'p')->addSelect('p')
-                ->leftJoin('c.author', 'a')->addSelect('a')
-                ->orderBy('c.createdAt', 'DESC'),
+            $commentRepository->createAdminModerationQueryBuilder(),
             $request->query->getInt('page', 1),
             12
         );

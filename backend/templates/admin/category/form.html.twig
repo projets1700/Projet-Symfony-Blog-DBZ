@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+{% block auto_refresh_enabled %}false{% endblock %}
+{% block title %}{{ mode }} une categorie{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">{{ mode }} une categorie</h1>
+                <p class="page-subtitle">Le nom et l'image seront affiches dans l'onglet Articles.</p>
+            </div>
+            <a href="{{ path('app_admin_category_index') }}" class="btn btn-outline-light">Retour</a>
+        </div>
+
+        <div class="content-card form-shell">
+            {{ form_start(form) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.description) }}
+            {{ form_row(form.hierarchyType) }}
+            <div id="parent-category-wrap">
+                {{ form_row(form.parent) }}
+            </div>
+            {{ form_row(form.imageFile) }}
+
+            {% if form.vars.data.picture %}
+                <div class="edit-clean-preview mt-2">
+                    <img src="{{ form.vars.data.picture }}" alt="{{ form.vars.data.name }}" class="img-fluid">
+                </div>
+            {% endif %}
+
+            <div class="form-actions-bar form-actions-left">
+                <button class="btn btn-success">{{ mode }}</button>
+                <a href="{{ path('app_admin_category_index') }}" class="btn btn-outline-light">Annuler</a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+    <script>
+        (function () {
+            const typeField = document.getElementById('{{ form.hierarchyType.vars.id }}');
+            const parentWrap = document.getElementById('parent-category-wrap');
+
+            if (!typeField || !parentWrap) {
+                return;
+            }
+
+            const toggleParentField = () => {
+                const isSubCategory = typeField.value === 'sub';
+                parentWrap.style.display = isSubCategory ? '' : 'none';
+            };
+
+            toggleParentField();
+            typeField.addEventListener('change', toggleParentField);
+        })();
+    </script>
+{% endblock %}

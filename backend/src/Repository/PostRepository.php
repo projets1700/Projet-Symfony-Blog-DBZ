@@ -27,6 +27,17 @@ class PostRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Post[]
+     */
+    public function findLatestLimited(int $limit): array
+    {
+        return $this->createLatestQueryBuilder(true)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function createLatestQueryBuilder(bool $onlyApproved = false): QueryBuilder
     {
         $qb = $this->createQueryBuilder('p')
@@ -72,6 +83,13 @@ class PostRepository extends ServiceEntityRepository
         }
 
         return $qb;
+    }
+
+    public function createApprovedByCategoryQueryBuilder(int $categoryId): QueryBuilder
+    {
+        return $this->createLatestQueryBuilder(true)
+            ->andWhere('c.id = :categoryId')
+            ->setParameter('categoryId', $categoryId);
     }
 
     /**

@@ -6,59 +6,31 @@
     <div class="page-shell">
         <div class="page-header">
             <div>
-                <h1 class="page-title">Liste des articles</h1>
-                <p class="page-subtitle">Parcours toutes les publications du blog Dragon Ball Z.</p>
+                <h1 class="page-title">Articles par categorie</h1>
             </div>
         </div>
-        <div class="content-card mb-3">
-            <form method="get" class="row g-2 align-items-end">
-                <div class="col-md-5">
-                    <label for="q" class="form-label">Recherche</label>
-                    <input id="q" type="text" name="q" class="form-control" value="{{ filters.q }}" placeholder="Titre ou contenu">
-                </div>
-                <div class="col-md-3">
-                    <label for="category" class="form-label">Categorie</label>
-                    <select id="category" name="category" class="form-select">
-                        <option value="">Toutes</option>
-                        {% for category in categories %}
-                            <option value="{{ category.id }}" {{ filters.category == category.id ? 'selected' : '' }}>
-                                {{ category.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="sort" class="form-label">Tri</label>
-                    <select id="sort" name="sort" class="form-select">
-                        <option value="latest" {{ filters.sort == 'latest' ? 'selected' : '' }}>Plus recents</option>
-                        <option value="oldest" {{ filters.sort == 'oldest' ? 'selected' : '' }}>Plus anciens</option>
-                        <option value="title" {{ filters.sort == 'title' ? 'selected' : '' }}>Titre A-Z</option>
-                        <option value="popular" {{ filters.sort == 'popular' ? 'selected' : '' }}>Populaires</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex gap-2">
-                    <button class="btn btn-primary w-100" type="submit">Filtrer</button>
-                    <a class="btn btn-outline-light w-100" href="{{ path('app_post_index') }}">Reset</a>
-                </div>
-            </form>
-        </div>
-        <div class="content-card">
-            <div class="list-group">
-                {% for post in posts %}
-                    <a href="{{ path('app_post_show', {id: post.id}) }}" class="list-group-item list-group-item-action rounded-3">
-                        <h5 class="mb-1">{{ post.title }}</h5>
-                        <small class="text-muted">{{ post.category.name }} - {{ post.author.firstName }} {{ post.author.lastName }}</small>
-                        <div class="mt-1">
-                            <span class="badge text-bg-danger">Likes: {{ post.likes|length }}</span>
+        <div class="row g-4">
+            {% for category in categories %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card h-100 shonen-card">
+                        {% if category.picture %}
+                            <img src="{{ category.picture }}" class="card-img-top category-card-img" alt="{{ category.name }}">
+                        {% else %}
+                            <div class="category-card-placeholder d-flex align-items-center justify-content-center">
+                                <span class="text-muted">Image a definir</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold">{{ category.name }}</h5>
+                            <a href="{{ path('app_post_category', {id: category.id}) }}" class="btn btn-warning fw-bold mt-auto">Voir la categorie</a>
                         </div>
-                    </a>
-                {% else %}
-                    <div class="empty-state">Aucun article disponible.</div>
-                {% endfor %}
-            </div>
-            <div class="mt-3 d-flex justify-content-center">
-                {{ knp_pagination_render(posts) }}
-            </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="content-card tight empty-state">
+                    Aucune categorie disponible.
+                </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}

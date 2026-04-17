@@ -3,9 +3,14 @@
 {% block title %}Nouveau mot de passe{% endblock %}
 
 {% block body %}
-    <div class="page-shell">
-        <div class="content-card form-shell">
-            <h1 class="page-title mb-3">Choisir un nouveau mot de passe</h1>
+    <div class="page-shell auth-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Choisir un nouveau mot de passe</h1>
+                <p class="page-subtitle">Renseigne deux fois ton nouveau mot de passe.</p>
+            </div>
+        </div>
+        <div class="content-card">
             {{ form_start(resetForm) }}
             {{ form_row(resetForm.plainPassword.first) }}
             {{ form_row(resetForm.plainPassword.second) }}

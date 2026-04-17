@@ -57,7 +57,8 @@
         {% else %}
             <div class="content-card tight">
                 <div class="alert alert-warning mb-0">
-                    Acces visiteur : lecture uniquement. Connectez-vous pour publier un commentaire.
+                    Vous devez vous connecter pour publier un commentaire.
+                    <a href="{{ path('app_login') }}" class="alert-link">Se connecter</a>
                 </div>
             </div>
         {% endif %}
