@@ -1,27 +1,32 @@
 # Projet-Symfony-Blog-DBZ
 
-Application Symfony de blog sur l'univers Dragon Ball Z.
+Application Symfony d'un blog Dragon Ball Z avec espace public, espace administrateur, moderation, categories/sous-categories et generation automatique de contenu DBZ.
 
 ## Fonctionnalites principales
 
-- Likes d'articles (utilisateur connecte)
-- Recherche, filtres, tri et pagination des articles
-- Reinitialisation du mot de passe par email
-- Dashboard administrateur avec indicateurs
-- Auto-publication d'articles DBZ (generation locale)
-- Workflow de moderation: un article n'est visible qu'apres clic admin sur `Publier`
+- Interface 100% en francais
+- Menu lateral deroulant pour la navigation (plus lisible sur toutes les pages)
+- Articles classes par categories et sous-categories
+- Workflow de publication: un article reste invisible tant qu'il n'est pas publie par l'admin
+- Commentaires avec moderation admin (`pending`, `approved`, `rejected`)
+- Classement des commentaires par categorie > sous-categorie > article dans l'admin
+- Likes sur les articles (utilisateur connecte)
+- Dashboard administrateur (utilisateurs, articles, commentaires en attente, top articles)
+- Reinitialisation de mot de passe par email
+- Generation automatique d'articles DBZ (5 par execution) sans doublon de sujet
 - Durcissement securite admin (actions sensibles en POST + CSRF)
 
 ## Prerequis
 
 - PHP 8.4+
 - Composer
-- Docker Desktop (optionnel, pour PostgreSQL/Mailpit)
+- SQLite (fichier `backend/var/data.db`) ou autre SGBD configure
+- Docker Desktop (optionnel, pour Mailpit)
 - Symfony CLI (optionnel)
 
 ## Installation
 
-Depuis la racine du projet :
+Depuis la racine du projet:
 
 ```bash
 cd backend
@@ -30,30 +35,26 @@ composer install
 
 ## Base de donnees
 
+Depuis `backend`:
+
 ```bash
 php bin/console doctrine:migrations:migrate --no-interaction
 php bin/console app:seed-blog
 ```
 
-Optionnel (publier un article automatiquement) :
-
-```bash
-php bin/console app:autopublish-dbz
-```
-
-Important:
-- Les articles auto sont crees en `en attente` (`isApproved = false`)
-- Ils ne sont pas visibles cote visiteur/utilisateur tant que l'admin ne clique pas sur `Publier`
+Notes importantes:
+- `app:seed-blog` cree les comptes de demo, les categories DBZ et des donnees initiales
+- les articles auto sont crees en attente (`isApproved = false`) et doivent etre publies par un admin
 
 ## Lancer le projet
 
-Option Symfony CLI :
+Option Symfony CLI:
 
 ```bash
 symfony server:start
 ```
 
-Option PHP natif :
+Option PHP natif:
 
 ```bash
 php -S 127.0.0.1:8000 -t public
@@ -61,64 +62,85 @@ php -S 127.0.0.1:8000 -t public
 
 ## Emails en local (Mailpit)
 
-Dans `backend`, lancer le service mail :
+Dans `backend`:
 
 ```bash
 docker compose up -d mailer
 ```
 
-Interface web Mailpit :
+Acces Mailpit:
+- interface web: http://localhost:8025
+- SMTP local: `127.0.0.1:1025`
 
-- http://localhost:8025
+## Generation automatique DBZ
 
-SMTP local :
+Commande de publication automatique:
 
-- `127.0.0.1:1025`
+```bash
+php bin/console app:autopublish-dbz
+```
+
+Comportement actuel:
+- genere jusqu'a 5 articles par execution
+- evite les doublons de sujet
+- conserve un contenu coherent avec l'univers Dragon Ball Z
+- les articles restent en attente de validation admin
+
+## Moderation des commentaires (admin)
+
+Route: `/admin/utilisateurs/commentaires`
+
+- un commentaire utilisateur est cree en `pending`
+- l'admin peut le `Valider` ou le `Rejeter`
+- les actions sont disponibles uniquement sur les commentaires en attente
+- les commentaires approuves sont visibles publiquement sur l'article
 
 ## Routes utiles
 
-- Front:
-  - `/`
-  - `/articles`
-  - `/connexion`
-  - `/inscription`
-  - `/mot-de-passe/oublie`
-- Admin:
-  - `/admin`
-  - `/admin/articles`
-  - `/admin/utilisateurs`
-  - `/admin/utilisateurs/commentaires`
+Public:
+- `/`
+- `/articles`
+- `/articles/categorie/{id}`
+- `/connexion`
+- `/inscription`
+- `/mot-de-passe/oublie`
+
+Admin:
+- `/admin/articles`
+- `/admin/categories`
+- `/admin/utilisateurs`
+- `/admin/utilisateurs/commentaires`
+- `/admin/dashboard`
 
 ## Comptes de demo
 
-- Admin
-  - Email: `admin@blog.local`
-  - Mot de passe: `Admin123!`
-- Utilisateur
-  - Email: `fan@dbz.local`
-  - Mot de passe: `Fan123!`
+Admin:
+- email: `admin@blog.local`
+- mot de passe: `Admin123!`
+
+Utilisateur:
+- email: `fan@dbz.local`
+- mot de passe: `Fan123!`
 
 ## Commandes rapides
 
-Depuis `backend` :
+Depuis `backend`:
 
 ```bash
-# lancer les migrations
+# migrations
 php bin/console doctrine:migrations:migrate --no-interaction
 
-# injecter les donnees initiales
+# donnees de depart
 php bin/console app:seed-blog
 
-# publier un article auto DBZ
+# generation auto DBZ (5 articles)
 php bin/console app:autopublish-dbz
 
-# verifier le container Symfony
+# verification conteneur Symfony
 php bin/console lint:container
 ```
 
-## Illustrations automatiques des articles auto
-
-La generation d'illustration par IA est optionnelle et desactivee sans cle API.
+## Variables d'environnement IA (optionnel)
 
 Dans `backend/.env.local`:
 
@@ -127,11 +149,11 @@ OPENAI_API_KEY=sk-...
 OPENAI_IMAGE_MODEL=gpt-image-1
 ```
 
-Ensuite, les commandes auto (`app:seed-blog`, `app:autopublish-dbz`) peuvent associer une illustration au sujet de l'article. Sans cle, l'article est cree sans image.
+Si non renseignees, la generation d'illustration peut etre ignoree selon la configuration locale.
 
 ## Depannage rapide Docker/WSL
 
-Si Docker indique "WSL needs updating" :
+Si Docker affiche "WSL needs updating":
 
 ```cmd
 wsl --update

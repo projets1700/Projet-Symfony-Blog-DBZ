@@ -88,8 +88,6 @@
                 </a>
                 {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                     <a class="side-nav-link" href="{{ path('app_home', {'_switch_user': '_exit'}) }}">Quitter mode utilisateur</a>
-                {% elseif is_granted('ROLE_ADMIN') %}
-                    <a class="side-nav-link" href="{{ path('app_home', {'_switch_user': 'fan@dbz.local'}) }}">Tester en utilisateur</a>
                 {% endif %}
                 <a class="side-nav-link" href="{{ path('app_logout') }}">Deconnexion</a>
             </div>
