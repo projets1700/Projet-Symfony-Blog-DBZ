@@ -44,14 +44,18 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <form method="post" action="{{ path('app_admin_comment_validate', {id: comment.id}) }}" class="d-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('validate_comment_' ~ comment.id) }}">
-                                    <button class="btn btn-sm btn-success">Valider</button>
-                                </form>
-                                <form method="post" action="{{ path('app_admin_comment_reject', {id: comment.id}) }}" class="d-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('reject_comment_' ~ comment.id) }}">
-                                    <button class="btn btn-sm btn-outline-danger">Rejeter</button>
-                                </form>
+                                {% if comment.status == 'pending' %}
+                                    <form method="post" action="{{ path('app_admin_comment_validate', {id: comment.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('validate_comment_' ~ comment.id) }}">
+                                        <button class="btn btn-sm btn-success">Valider</button>
+                                    </form>
+                                    <form method="post" action="{{ path('app_admin_comment_reject', {id: comment.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('reject_comment_' ~ comment.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">Rejeter</button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted">Action deja traitee</span>
+                                {% endif %}
                             </td>
                         </tr>
                     {% else %}

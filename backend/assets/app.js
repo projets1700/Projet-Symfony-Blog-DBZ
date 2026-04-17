@@ -68,3 +68,57 @@ const enableAutoRefresh = () => {
 };
 
 enableAutoRefresh();
+
+const enableSideNavigation = () => {
+    const body = document.body;
+    const panel = document.querySelector('[data-side-nav-backdrop]');
+    const toggleButton = document.querySelector('[data-side-nav-toggle]');
+    const closeButton = document.querySelector('[data-side-nav-close]');
+
+    if (!(body instanceof HTMLBodyElement) || !(toggleButton instanceof HTMLButtonElement)) {
+        return;
+    }
+
+    const closeMenu = () => {
+        body.classList.remove('side-nav-open');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        const sideNav = document.getElementById('side-navigation');
+        if (sideNav) {
+            sideNav.setAttribute('aria-hidden', 'true');
+        }
+    };
+
+    const openMenu = () => {
+        body.classList.add('side-nav-open');
+        toggleButton.setAttribute('aria-expanded', 'true');
+        const sideNav = document.getElementById('side-navigation');
+        if (sideNav) {
+            sideNav.setAttribute('aria-hidden', 'false');
+        }
+    };
+
+    toggleButton.addEventListener('click', () => {
+        if (body.classList.contains('side-nav-open')) {
+            closeMenu();
+            return;
+        }
+
+        openMenu();
+    });
+
+    if (closeButton instanceof HTMLButtonElement) {
+        closeButton.addEventListener('click', closeMenu);
+    }
+
+    if (panel instanceof HTMLElement) {
+        panel.addEventListener('click', closeMenu);
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && body.classList.contains('side-nav-open')) {
+            closeMenu();
+        }
+    });
+};
+
+enableSideNavigation();

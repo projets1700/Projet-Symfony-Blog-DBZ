@@ -113,8 +113,15 @@ class UserAdminController extends AbstractController
             return $this->redirectToRoute('app_admin_comment_index');
         }
 
+        if ('pending' !== $comment->getStatus()) {
+            $this->addFlash('error', 'Seuls les commentaires en attente peuvent etre valides.');
+
+            return $this->redirectToRoute('app_admin_comment_index');
+        }
+
         $comment->setStatus('approved');
         $entityManager->flush();
+        $this->addFlash('success', 'Commentaire valide avec succes.');
 
         return $this->redirectToRoute('app_admin_comment_index');
     }
@@ -128,8 +135,15 @@ class UserAdminController extends AbstractController
             return $this->redirectToRoute('app_admin_comment_index');
         }
 
-        $comment->setStatus('deleted');
+        if ('pending' !== $comment->getStatus()) {
+            $this->addFlash('error', 'Seuls les commentaires en attente peuvent etre rejetes.');
+
+            return $this->redirectToRoute('app_admin_comment_index');
+        }
+
+        $comment->setStatus('rejected');
         $entityManager->flush();
+        $this->addFlash('success', 'Commentaire rejete.');
 
         return $this->redirectToRoute('app_admin_comment_index');
     }

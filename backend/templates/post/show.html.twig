@@ -35,7 +35,7 @@
                             <small class="text-muted">
                                 {{ comment.author.firstName }} {{ comment.author.lastName }} - {{ comment.createdAt|date('d/m/Y H:i') }}
                                 {% if is_granted('ROLE_ADMIN') %}
-                                    ({% if comment.status == 'approved' %}approuve{% elseif comment.status == 'rejected' %}rejete{% else %}en attente{% endif %})
+                                    ({% if comment.status == 'approved' %}approuve{% elseif comment.status in ['rejected', 'deleted'] %}rejete{% else %}en attente{% endif %})
                                 {% endif %}
                             </small>
                         </div>
