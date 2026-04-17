@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
 use App\Entity\Category;
+use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\PostLike;
 use App\Entity\User;
@@ -33,6 +33,33 @@ class PostController extends AbstractController
         ]);
     }
 
+    #[Route('/articles/analyse-de-l-oeuvre', name: 'app_post_work_analysis')]
+    public function workAnalysis(
+        Request $request,
+        CategoryRepository $categoryRepository,
+        PostRepository $postRepository,
+        PaginatorInterface $paginator
+    ): Response {
+        $category = $categoryRepository->findOneBy(['name' => Category::ANALYSIS_CATEGORY_NAME]);
+        if (!$category instanceof Category) {
+            return $this->render('post/work_analysis.html.twig', [
+                'category' => null,
+                'posts' => null,
+            ]);
+        }
+
+        $postsPagination = $paginator->paginate(
+            $postRepository->createApprovedAnalysisCategoryQueryBuilder((int) $category->getId()),
+            $request->query->getInt('page', 1),
+            8
+        );
+
+        return $this->render('post/work_analysis.html.twig', [
+            'category' => $category,
+            'posts' => $postsPagination,
+        ]);
+    }
+
     #[Route('/articles/categorie/{id}', name: 'app_post_category', requirements: ['id' => '\d+'])]
     public function byCategory(
         Category $category,
@@ -40,6 +67,10 @@ class PostController extends AbstractController
         PostRepository $postRepository,
         PaginatorInterface $paginator
     ): Response {
+        if (Category::ANALYSIS_CATEGORY_NAME === $category->getName()) {
+            return $this->redirectToRoute('app_post_work_analysis');
+        }
+
         $postsPagination = $paginator->paginate(
             $postRepository->createApprovedByCategoryQueryBuilder((int) $category->getId()),
             $request->query->getInt('page', 1),

@@ -55,6 +55,7 @@
     <div class="side-nav-body">
         <div class="side-nav-section">
             <a class="side-nav-link" href="{{ path('app_post_index') }}">Articles</a>
+            <a class="side-nav-link" href="{{ path('app_post_work_analysis') }}">Analyse de l'oeuvre</a>
             {% if is_granted('ROLE_ADMIN') %}
                 <a class="side-nav-link" href="{{ path('app_admin_dashboard') }}">Tableau de bord</a>
                 <a class="side-nav-link" href="{{ path('app_admin_post_index') }}">Gestion des articles</a>

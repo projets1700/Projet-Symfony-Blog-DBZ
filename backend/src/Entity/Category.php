@@ -133,4 +133,9 @@ class Category
 
         return $this;
     }
+
+    /**
+     * Categorie reservee: articles listes uniquement sur la page dediee "Analyse de l'oeuvre".
+     */
+    public const ANALYSIS_CATEGORY_NAME = 'Analyse';
 }

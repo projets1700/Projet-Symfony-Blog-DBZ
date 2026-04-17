@@ -23,6 +23,8 @@ class CategoryRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.parent IS NULL')
+            ->andWhere('c.name != :reservedAnalysis')
+            ->setParameter('reservedAnalysis', Category::ANALYSIS_CATEGORY_NAME)
             ->orderBy('c.name', 'ASC')
             ->getQuery()
             ->getResult();

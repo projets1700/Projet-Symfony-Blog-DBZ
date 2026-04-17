@@ -7,6 +7,7 @@ Application Symfony d'un blog Dragon Ball Z avec espace public, espace administr
 - Interface 100% en francais
 - Menu lateral deroulant pour la navigation (plus lisible sur toutes les pages)
 - Articles classes par categories et sous-categories
+- Page dediee Analyse de l'oeuvre (`/articles/analyse-de-l-oeuvre`) : uniquement les articles de la categorie reservee `Analyse` (non listes sur l accueil ni dans la grille Articles par categorie)
 - Workflow de publication: un article reste invisible tant qu'il n'est pas publie par l'admin
 - Commentaires avec moderation admin (`pending`, `approved`, `rejected`)
 - Classement des commentaires par categorie > sous-categorie > article dans l'admin
@@ -14,6 +15,7 @@ Application Symfony d'un blog Dragon Ball Z avec espace public, espace administr
 - Dashboard administrateur (utilisateurs, articles, commentaires en attente, top articles)
 - Reinitialisation de mot de passe par email
 - Generation automatique d'articles DBZ (5 par execution) sans doublon de sujet
+- Categorie reservee `Analyse` : articles visibles uniquement sur `/articles/analyse-de-l-oeuvre` ; commandes dediees pour creer la categorie et generer du contenu
 - Durcissement securite admin (actions sensibles en POST + CSRF)
 
 ## Prerequis
@@ -86,6 +88,21 @@ Comportement actuel:
 - conserve un contenu coherent avec l'univers Dragon Ball Z
 - les articles restent en attente de validation admin
 
+## Analyse de l oeuvre (categorie Analyse)
+
+La categorie `Analyse` est reservee : ses articles n apparaissent pas sur l accueil ni dans la grille des categories, uniquement sur la page publique dediee.
+
+Commandes (depuis `backend`) :
+
+| Commande | Role |
+|----------|------|
+| `php bin/console app:ensure-analyse-category` | Cree la categorie `Analyse` si elle n existe pas |
+| `php bin/console app:generate-analysis-articles` | Ajoute 5 nouveaux articles `Analyse` (publies, visibles sur la page dediee) |
+| `php bin/console app:generate-analysis-articles 10` | Ajoute 10 articles |
+| `php bin/console app:generate-analysis-articles --ensure` | Complete jusqu a 5 articles au total (comportement proche du seed) |
+
+Au seed (`app:seed-blog`), des articles d analyse peuvent etre ajoutes jusqu a 5 au total dans cette categorie (avec `--ensure` logique interne).
+
 ## Moderation des commentaires (admin)
 
 Route: `/admin/utilisateurs/commentaires`
@@ -113,6 +130,7 @@ Dans `/admin/utilisateurs`, les regles suivantes sont appliquees:
 Public:
 - `/`
 - `/articles`
+- `/articles/analyse-de-l-oeuvre`
 - `/articles/categorie/{id}`
 - `/connexion`
 - `/inscription`
@@ -148,6 +166,18 @@ php bin/console app:seed-blog
 
 # generation auto DBZ (5 articles)
 php bin/console app:autopublish-dbz
+
+# creer uniquement la categorie Analyse (si absente)
+php bin/console app:ensure-analyse-category
+
+# articles Analyse de l oeuvre (cree 5 nouveaux articles par defaut)
+php bin/console app:generate-analysis-articles
+
+# creer un nombre precis d articles Analyse (exemple: 10)
+php bin/console app:generate-analysis-articles 10
+
+# uniquement combler jusqu a 5 articles au total (comme au seed)
+php bin/console app:generate-analysis-articles --ensure
 
 # verification conteneur Symfony
 php bin/console lint:container

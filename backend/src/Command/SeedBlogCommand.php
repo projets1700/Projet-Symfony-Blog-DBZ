@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Service\AnalysisArticleProvisioner;
 use App\Service\AutoIllustrationGenerator;
 use App\Service\DbzArticleGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,7 +23,8 @@ class SeedBlogCommand extends Command
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly DbzArticleGenerator $dbzArticleGenerator,
-        private readonly AutoIllustrationGenerator $autoIllustrationGenerator
+        private readonly AutoIllustrationGenerator $autoIllustrationGenerator,
+        private readonly AnalysisArticleProvisioner $analysisArticleProvisioner
     ) {
         parent::__construct();
     }
@@ -67,7 +69,8 @@ class SeedBlogCommand extends Command
             'Villains' => 'Les antagonistes mythiques qui ont pousse les heros dans leurs derniers retranchements.',
             'Saga Cell' => 'Analyses et moments forts autour de la saga Cell et des Cell Games.',
             'Saga Buu' => 'Les transformations de Majin Buu, Vegeto et le combat final pour sauver la Terre.',
-            'Tournois' => 'Les affrontements, qualifications et duels les plus memorables des tournois.'
+            'Tournois' => 'Les affrontements, qualifications et duels les plus memorables des tournois.',
+            'Analyse' => 'Analyses approfondies de l oeuvre Dragon Ball Z. Les articles de cette categorie sont regroupes sur la page Analyse de l oeuvre.',
         ];
 
         foreach ($categoryData as $categoryName => $description) {
@@ -197,6 +200,17 @@ class SeedBlogCommand extends Command
             $autoPost->setPublishedAt(new \DateTimeImmutable(sprintf('-%d hours', random_int(6, 120))));
             $this->entityManager->persist($autoPost);
             $usedSubjectKeys[] = $generated['subjectKey'];
+        }
+
+        if (isset($categories[Category::ANALYSIS_CATEGORY_NAME])) {
+            $createdAnalysis = $this->analysisArticleProvisioner->ensureArticles(
+                $categories[Category::ANALYSIS_CATEGORY_NAME],
+                $admin,
+                5
+            );
+            if ($createdAnalysis > 0) {
+                $output->writeln(sprintf('<info>%d article(s) Analyse de l oeuvre ajoute(s).</info>', $createdAnalysis));
+            }
         }
 
         $this->entityManager->flush();

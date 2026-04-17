@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Category;
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -22,7 +23,7 @@ class PostRepository extends ServiceEntityRepository
      */
     public function findLatest(): array
     {
-        return $this->createLatestQueryBuilder(true)
+        return $this->createLatestQueryBuilder(true, true)
             ->getQuery()
             ->getResult();
     }
@@ -32,13 +33,13 @@ class PostRepository extends ServiceEntityRepository
      */
     public function findLatestLimited(int $limit): array
     {
-        return $this->createLatestQueryBuilder(true)
+        return $this->createLatestQueryBuilder(true, true)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
 
-    public function createLatestQueryBuilder(bool $onlyApproved = false): QueryBuilder
+    public function createLatestQueryBuilder(bool $onlyApproved = false, bool $excludeAnalysisCategory = false): QueryBuilder
     {
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.category', 'c')
@@ -55,12 +56,17 @@ class PostRepository extends ServiceEntityRepository
                 ->setParameter('approved', true);
         }
 
+        if ($excludeAnalysisCategory) {
+            $qb->andWhere('c.id IS NULL OR c.name != :analysisCategoryName')
+                ->setParameter('analysisCategoryName', Category::ANALYSIS_CATEGORY_NAME);
+        }
+
         return $qb;
     }
 
     public function createFilteredQueryBuilder(?string $query, ?int $categoryId, string $sort): QueryBuilder
     {
-        $qb = $this->createLatestQueryBuilder(true);
+        $qb = $this->createLatestQueryBuilder(true, true);
 
         if (null !== $query && '' !== trim($query)) {
             $qb->andWhere('p.title LIKE :query OR p.content LIKE :query')
@@ -87,9 +93,16 @@ class PostRepository extends ServiceEntityRepository
 
     public function createApprovedByCategoryQueryBuilder(int $categoryId): QueryBuilder
     {
-        return $this->createLatestQueryBuilder(true)
+        return $this->createLatestQueryBuilder(true, true)
             ->andWhere('c.id = :categoryId')
             ->setParameter('categoryId', $categoryId);
+    }
+
+    public function createApprovedAnalysisCategoryQueryBuilder(int $categoryId): QueryBuilder
+    {
+        return $this->createLatestQueryBuilder(true, false)
+            ->andWhere('c.id = :analysisCategoryId')
+            ->setParameter('analysisCategoryId', $categoryId);
     }
 
     /**
@@ -101,9 +114,13 @@ class PostRepository extends ServiceEntityRepository
             ->select('p.title AS title')
             ->addSelect('COUNT(DISTINCT l.id) AS likesCount')
             ->addSelect('COUNT(DISTINCT c.id) AS commentsCount')
+            ->leftJoin('p.category', 'cat')
             ->leftJoin('p.likes', 'l')
             ->leftJoin('p.comments', 'c')
+            ->andWhere('cat.id IS NULL OR cat.name != :analysisCategoryName')
+            ->setParameter('analysisCategoryName', Category::ANALYSIS_CATEGORY_NAME)
             ->groupBy('p.id')
+            ->addGroupBy('cat.id')
             ->orderBy('likesCount', 'DESC')
             ->addOrderBy('commentsCount', 'DESC')
             ->addOrderBy('p.publishedAt', 'DESC')

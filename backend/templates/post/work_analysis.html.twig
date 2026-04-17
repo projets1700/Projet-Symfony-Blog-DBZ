@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Analyse de l'oeuvre{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Analyse de l'oeuvre</h1>
+                {% if category %}
+                    <p class="page-subtitle">{{ category.description ?: 'Textes d analyse et reflexions sur Dragon Ball Z.' }}</p>
+                {% else %}
+                    <p class="page-subtitle">La categorie « Analyse » n est pas encore configuree. Executez le seed ou creez-la dans l administration.</p>
+                {% endif %}
+            </div>
+            <a href="{{ path('app_post_index') }}" class="btn btn-outline-light">Articles par categorie</a>
+        </div>
+
+        {% if category and posts is not null %}
+            <div class="content-card">
+                <div class="list-group">
+                    {% for post in posts %}
+                        <a href="{{ path('app_post_show', {id: post.id}) }}" class="list-group-item list-group-item-action rounded-3">
+                            <h5 class="mb-1">{{ post.title }}</h5>
+                            <small class="text-muted">
+                                {{ post.author.firstName }} {{ post.author.lastName }} - {{ post.publishedAt|date('d/m/Y H:i') }}
+                            </small>
+                            <div class="mt-1">
+                                <span class="badge text-bg-danger">Likes: {{ post.likes|length }}</span>
+                            </div>
+                        </a>
+                    {% else %}
+                        <div class="empty-state">Aucun article publie dans cette section pour le moment.</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-3 d-flex justify-content-center">
+                    {{ knp_pagination_render(posts) }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
