@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <section class="hero-shonen">
+            <div class="hero-shonen-overlay">
+                <p class="hero-kicker">Univers Dragon Ball Z</p>
+                <h1 class="display-5 fw-bold mb-3">Bienvenue sur le blog Dragon Ball Z</h1>
+                <p class="lead mb-0">
+                    Retrouve les meilleures analyses sur les sagas, les guerriers Saiyans, les transformations, les ennemis mythiques et toute l'energie de Dragon Ball Z.
+                </p>
+                <div class="audio-panel mt-4">
+                    <p class="mb-2 fw-bold">Musique du jour : CHA-LA HEAD-CHA-LA</p>
+                    <audio controls preload="metadata" class="w-100">
+                        <source src="/audio/cha-la-head-cha-la.mp3" type="audio/mpeg">
+                        Votre navigateur ne supporte pas la lecture audio.
+                    </audio>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-shell">
+            <div class="page-header">
+                <div>
+                    <h2 class="page-title">Derniers articles DBZ</h2>
+                    <p class="page-subtitle">Les derniers sujets publies sur l'univers Dragon Ball Z.</p>
+                </div>
+            </div>
+            <div class="content-card tight">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="alert alert-info mb-0">Mode administrateur : vous pouvez gerer les articles, utilisateurs et commentaires depuis le menu.</div>
+                {% elseif app.user %}
+                    <div class="alert alert-success mb-0">Mode utilisateur : vous pouvez lire les articles, commenter et modifier votre profil.</div>
+                {% else %}
+                    <div class="alert alert-warning mb-0">Mode visiteur : consultation uniquement. Connectez-vous pour commenter et acceder a votre profil.</div>
+                {% endif %}
+            </div>
+            <div class="row g-4">
+                {% for post in posts %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100 shonen-card">
+                            {% if post.picture %}
+                                <img src="{{ post.picture }}" class="card-img-top shonen-card-img" alt="{{ post.title }}">
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">{{ post.title }}</h5>
+                                <p class="card-text text-muted">{{ post.category.name }} - {{ post.publishedAt|date('d/m/Y') }}</p>
+                                <a href="{{ path('app_post_show', {id: post.id}) }}" class="btn btn-warning fw-bold mt-auto">Lire l'article</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="content-card tight empty-state">
+                        Aucun article pour le moment.
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Gestion des utilisateurs</h1>
+                <p class="page-subtitle">Consulte les comptes et gere leur activation dans une meme mise en page.</p>
+            </div>
+        </div>
+        <div class="content-card">
+            <div class="table-wrap">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Nom</th>
+                        <th>Rôles</th>
+                        <th>Actif</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.firstName }} {{ user.lastName }}</td>
+                            <td>{{ user.roles|join(', ') }}</td>
+                            <td>{{ user.isActive ? 'Oui' : 'Non' }}</td>
+                            <td>
+                                {% if user.isActive %}
+                                    <a href="{{ path('app_admin_user_deactivate', {id: user.id}) }}" class="btn btn-sm btn-danger">Désactiver</a>
+                                {% else %}
+                                    <a href="{{ path('app_admin_user_activate', {id: user.id}) }}" class="btn btn-sm btn-success">Activer</a>
+                                {% endif %}
+                                {% if app.user and app.user.id == user.id %}
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Suppression impossible</button>
+                                {% else %}
+                                    <form method="post" action="{{ path('app_admin_user_delete', {id: user.id}) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de cet utilisateur ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5">Aucun utilisateur.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

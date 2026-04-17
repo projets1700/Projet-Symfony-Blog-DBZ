@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ mode }} un article{% endblock %}
+{% block auto_refresh_enabled %}false{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">{{ mode }} un article</h1>
+                <p class="page-subtitle">Une page d'edition sobre et lisible pour travailler ton article confortablement.</p>
+            </div>
+            <a href="{{ path('app_admin_post_index') }}" class="btn btn-outline-light">Retour a la liste</a>
+        </div>
+        <div class="content-card form-shell edit-clean-shell">
+            {{ form_start(form) }}
+            <div class="edit-main-fields">
+                <div class="edit-content-box">
+                    {{ form_row(form.title) }}
+                    <div class="mb-3">
+                        <label for="post_content" class="required">Contenu</label>
+                        <textarea id="post_content" name="post[content]" required="required" class="form-control">{{ form.content.vars.value }}</textarea>
+                        {{ form_errors(form.content) }}
+                    </div>
+                </div>
+            </div>
+            <div class="edit-secondary-fields">
+                {{ form_row(form.category) }}
+                {{ form_row(form.imageFile) }}
+            </div>
+
+            {% if form.vars.data.picture %}
+                <div class="edit-clean-preview">
+                    <img src="{{ form.vars.data.picture }}" alt="{{ form.vars.data.title }}" class="img-fluid">
+                </div>
+            {% else %}
+                <div class="edit-soft-note">
+                    <strong>Conseil :</strong> ajoute une image pour un rendu plus attractif dans la liste des articles.
+                </div>
+            {% endif %}
+
+            <div class="form-actions-bar form-actions-left">
+                <button class="btn btn-success">{{ mode }}</button>
+                <a href="{{ path('app_admin_post_index') }}" class="btn btn-outline-light">Annuler</a>
+            </div>
+            {{ form_widget(form._token) }}
+            {{ form_end(form, {'render_rest': false}) }}
+        </div>
+    </div>
+{% endblock %}

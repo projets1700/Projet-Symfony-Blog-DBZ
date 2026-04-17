@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <article class="content-card">
+            <h1 class="page-title mb-2">{{ post.title }}</h1>
+            <p class="page-subtitle">{{ post.category.name }} - {{ post.publishedAt|date('d/m/Y H:i') }}</p>
+            {% if post.picture %}
+                <img src="{{ post.picture }}" class="article-cover my-4" alt="{{ post.title }}">
+            {% endif %}
+            <div class="lh-lg">{{ post.content|nl2br }}</div>
+        </article>
+
+        <section class="content-card">
+            <h2 class="section-title">Commentaires</h2>
+            {% for comment in post.comments %}
+                {% if comment.status == 'approved' or is_granted('ROLE_ADMIN') %}
+                    <div class="card comment-card mb-3">
+                        <div class="card-body">
+                            <p class="mb-1">{{ comment.content }}</p>
+                            <small class="text-muted">
+                                {{ comment.author.firstName }} {{ comment.author.lastName }} - {{ comment.createdAt|date('d/m/Y H:i') }}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    ({% if comment.status == 'approved' %}approuve{% elseif comment.status == 'rejected' %}rejete{% else %}en attente{% endif %})
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <p class="empty-state">Aucun commentaire.</p>
+            {% endfor %}
+        </section>
+
+        {% if app.user %}
+            <section class="content-card form-shell">
+                <h3 class="section-title">Ajouter un commentaire</h3>
+                {{ form_start(commentForm) }}
+                {{ form_row(commentForm.content) }}
+                <button class="btn btn-primary">Envoyer</button>
+                {{ form_end(commentForm) }}
+            </section>
+        {% else %}
+            <div class="content-card tight">
+                <div class="alert alert-warning mb-0">
+                    Acces visiteur : lecture uniquement. Connectez-vous pour publier un commentaire.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

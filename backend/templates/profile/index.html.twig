@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Mon profil</h1>
+                <p class="page-subtitle">Consulte et modifie tes informations dans une mise en page plus reguliere.</p>
+            </div>
+        </div>
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4">
+                <div class="card shonen-card h-100">
+                    <div class="card-body text-center">
+                        {% if user.profilePicture %}
+                            <img src="{{ user.profilePicture }}" alt="{{ user.firstName }}" class="img-fluid rounded-circle mb-3" style="width: 180px; height: 180px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center bg-warning text-dark fw-bold" style="width: 180px; height: 180px; font-size: 3rem;">
+                                {{ user.firstName|first }}{{ user.lastName|first }}
+                            </div>
+                        {% endif %}
+                        <h2 class="h3">{{ user.firstName }} {{ user.lastName }}</h2>
+                        <p class="text-muted mb-1">{{ user.email }}</p>
+                        <p class="mb-0">Compte actif : {{ user.isActive ? 'Oui' : 'Non' }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="content-card h-100">
+                    <h2 class="section-title">Modifier mes informations</h2>
+                    {{ form_start(profileForm) }}
+                    <div class="row">
+                        <div class="col-md-6">{{ form_row(profileForm.firstName) }}</div>
+                        <div class="col-md-6">{{ form_row(profileForm.lastName) }}</div>
+                    </div>
+                    {{ form_row(profileForm.email) }}
+                    {% if user.profilePicture %}
+                        <div class="mb-3">
+                            <label class="form-label">Photo actuelle</label>
+                            <div>
+                                <img src="{{ user.profilePicture }}" alt="{{ user.firstName }}" class="img-fluid rounded" style="max-height: 220px;">
+                            </div>
+                        </div>
+                    {% endif %}
+                    {{ form_row(profileForm.profilePictureFile) }}
+                    <button class="btn btn-warning fw-bold">Enregistrer</button>
+                    {{ form_end(profileForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

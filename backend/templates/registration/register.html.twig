@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Créer un compte</h1>
+                <p class="page-subtitle">Rejoins la communaute avec un formulaire mieux aligne et plus lisible.</p>
+            </div>
+        </div>
+        <div class="content-card form-shell">
+            {{ form_start(registrationForm) }}
+            <div class="row">
+                <div class="col-md-6">{{ form_row(registrationForm.firstName) }}</div>
+                <div class="col-md-6">{{ form_row(registrationForm.lastName) }}</div>
+            </div>
+            {{ form_row(registrationForm.email) }}
+            {{ form_row(registrationForm.profilePicture) }}
+            {{ form_row(registrationForm.plainPassword) }}
+            <button class="btn btn-success">S'inscrire</button>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <div class="page-shell auth-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Connexion</h1>
+                <p class="page-subtitle">Accede a ton espace avec une page plus claire et mieux equilibree.</p>
+            </div>
+        </div>
+        <div class="content-card">
+            <form method="post">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="_username" value="{{ last_username }}" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" name="_password" required class="form-control">
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

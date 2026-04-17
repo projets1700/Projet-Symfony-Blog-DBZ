@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Articles{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Liste des articles</h1>
+                <p class="page-subtitle">Parcours toutes les publications du blog Dragon Ball Z.</p>
+            </div>
+        </div>
+        <div class="content-card">
+            <div class="list-group">
+                {% for post in posts %}
+                    <a href="{{ path('app_post_show', {id: post.id}) }}" class="list-group-item list-group-item-action rounded-3">
+                        <h5 class="mb-1">{{ post.title }}</h5>
+                        <small class="text-muted">{{ post.category.name }} - {{ post.author.firstName }} {{ post.author.lastName }}</small>
+                    </a>
+                {% else %}
+                    <div class="empty-state">Aucun article disponible.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

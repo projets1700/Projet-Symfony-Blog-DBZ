@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modération des commentaires{% endblock %}
+
+{% block body %}
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Modération des commentaires</h1>
+                <p class="page-subtitle">Valide ou rejette les commentaires dans une interface plus lisible.</p>
+            </div>
+        </div>
+        <div class="content-card">
+            <div class="table-wrap">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Article</th>
+                        <th>Auteur</th>
+                        <th>Contenu</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for comment in comments %}
+                        <tr>
+                            <td>{{ comment.post.title }}</td>
+                            <td>{{ comment.author.firstName }} {{ comment.author.lastName }}</td>
+                            <td>{{ comment.content }}</td>
+                            <td>
+                                {% if comment.status == 'approved' %}
+                                    Approuve
+                                {% elseif comment.status == 'rejected' %}
+                                    Rejete
+                                {% else %}
+                                    En attente
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('app_admin_comment_validate', {id: comment.id}) }}" class="btn btn-sm btn-success">Valider</a>
+                                <a href="{{ path('app_admin_comment_reject', {id: comment.id}) }}" class="btn btn-sm btn-outline-danger">Rejeter</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5">Aucun commentaire.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
