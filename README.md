@@ -1,4 +1,4 @@
-# Projet-Symfony-Blog-DBZ
+# Projet-Symfony-Blog-DBZ ecole 
 
 Application Symfony d'un blog Dragon Ball Z avec espace public, espace administrateur, moderation, categories/sous-categories et generation automatique de contenu DBZ.
 
